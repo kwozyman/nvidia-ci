@@ -9,11 +9,11 @@ set -x
 if [ "${channel}" = "stable" ]; then
     #todo: better differentiate between types of deployments (catalogsource bundle, marketplace etc)
     currentCSV=$(${oc_command} get packagemanifests/gpu-operator-certified -n openshift-marketplace -ojson | jq -r '.status.channels[] | select(.name == "stable") | .currentCSV')
-    cp subscription.yaml _subscription.yaml
-    echo "  startingCSV: ${currentCSV}" >> _subscription.yaml
-    echo "  channel: ${channel}" >> _subscription.yaml
+    cp subscription.yaml /tmp/_subscription.yaml
+    echo "  startingCSV: ${currentCSV}" >> /tmp/_subscription.yaml
+    echo "  channel: ${channel}" >> /tmp/_subscription.yaml
     ${oc_command} apply -f operatorgroup.yaml
-    ${oc_command} apply -f _subscription.yaml
+    ${oc_command} apply -f /tmp/_subscription.yaml
 else
     operator-sdk run bundle --kubeconfig /var/run/secrets/armsnokubeconfig--timeout=1m -n nvidia-gpu-operator --install-mode OwnNamespace "${bundle}"
 fi
